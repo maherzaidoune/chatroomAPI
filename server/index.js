@@ -3,7 +3,7 @@ var http = require('http')
 var socketio = require('socket.io');
 var mongojs = require('mongojs');
 
-var db = mongojs(process.env.MONGO_URL || 'mongodb://test:test12@ds343895.mlab.com:43895/chatroom');
+var db = mongojs('mongodb://test:test12@ds343895.mlab.com:43895/chatroom');
 var app = express();
 var server = http.Server(app);
 var websocket = socketio(server);
