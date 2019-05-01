@@ -86,23 +86,23 @@ app.get('/rooms', function(req, res) {
   
 });
 
-const schema = Joi.object().keys({
-  name: Joi.string().min(3).max(30).required(),
-  color: Joi.string().min(3).max(30),
-  avatarUrl: Joi.string().min(10).max(300)
-});
+// const schema = Joi.object().keys({
+//   name: Joi.string().min(3).max(30).required(),
+//   color: Joi.string().min(3).max(30),
+//   avatarUrl: Joi.string().min(10).max(300)
+// });
 
 app.post('/rooms', function (req, res) {
   console.log(req.body);
-  const result = Joi.validate(req.body, schema);
+  //const result = Joi.validate(req.body, schema);
   console.log(result);
-  if(result.error === null){
+  //if(result.error === null){
     db.collection('chatroom').insert(req.body, (err, chatroom) => {
       console.log(chatroom);
       res.status(200).send({chatroom});
     });
-  }else{
-    res.status(422).send({error: 'format invalid'});
-  }
+  // }else{
+  //   res.status(422).send({error: 'format invalid'});
+  // }
   
 });
