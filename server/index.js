@@ -95,7 +95,7 @@ app.get('/rooms', function(req, res) {
 app.post('/rooms', function (req, res) {
   console.log(req.body);
   //const result = Joi.validate(req.body, schema);
-  console.log(result);
+  //console.log(result);
   //if(result.error === null){
     db.collection('chatroom').insert(req.body, (err, chatroom) => {
       console.log(chatroom);
