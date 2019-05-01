@@ -3,26 +3,18 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "nodemon server",
-    "test": "jest",
-    "ios": "react-native run-ios",
-    "android": "react-native run-android",
-    "server": "nodemon server"
+    "start": "nodemon server"
   },
   "dependencies": {
+    "@hapi/joi": "^15.0.1",
+    "body-parser": "^1.19.0",
     "express": "^4.14.0",
     "mongojs": "^2.4.0",
     "nodemon": "^1.11.0",
-    "react": "15.4.1",
-    "react-native": "0.39.2",
-    "react-native-gifted-chat": "0.0.10",
     "socket.io": "^1.7.2"
   },
   "devDependencies": {
-    "babel-jest": "18.0.0",
-    "babel-preset-react-native": "1.9.1",
-    "jest": "18.0.0",
-    "react-test-renderer": "15.4.1"
+    "babel-jest": "18.0.0"
   },
   "jest": {
     "preset": "react-native"

@@ -2,13 +2,18 @@ var express = require('express');
 var http = require('http')
 var socketio = require('socket.io');
 var mongojs = require('mongojs');
+const Joi = require('@hapi/joi');
 
 var db = mongojs('mongodb://test:test12@ds343895.mlab.com:43895/chatroom');
 var app = express();
 var server = http.Server(app);
 var websocket = socketio(server);
 var port = process.env.PORT || 3000;
+var bodyParser = require('body-parser');
+
 server.listen(port, () => console.log(`listening on ${port}`));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 var clients = {};
 var users = {};
@@ -17,24 +22,18 @@ var chatId = 1;
 
 websocket.on('connection', (socket) => {
     clients[socket.id] = socket;
-    socket.on('userJoined', (userId) => onUserJoined(userId, socket));
+    socket.on('userJoined', (user, room) => onUserJoined(user, room, socket));
     socket.on('message', (message) => onMessageReceived(message, socket));
 });
 
-function onUserJoined(userId, socket) {
+function onUserJoined(user, room, socket) {
   try {
-    console.log("userId: ",userId," socket: ",socket)
-    // The userId is null for new users.
-    if (!userId) {
-      var user = db.collection('users').insert({}, (err, user) => {
-        socket.emit('userJoined', user._id);
-        users[socket.id] = user._id;
-        _sendExistingMessages(socket);
-      });
-    } else {
-      users[socket.id] = userId;
-      _sendExistingMessages(socket);
-    }
+    console.log("user: ",user,"room", room," socket: ",socket)
+
+  var user = db.collection('users').insert({user: user, room: room}, (err, user) => {
+      socket.join(room);
+  });
+    
   } catch(err) {
     console.err(err);
   }
@@ -42,7 +41,6 @@ function onUserJoined(userId, socket) {
 
 function onMessageReceived(message, senderSocket) {
   console.log("onMessageReceived === ",message)
-  var userId = users[senderSocket.id];
   _sendAndSaveMessage(message, senderSocket);
 }
 
@@ -69,9 +67,9 @@ function _sendAndSaveMessage(message, socket, fromServer) {
 
   if (message.text === '') return
   db.collection('messages').insert(message, (err, message) => {
-    var emitter = fromServer ? websocket : socket.broadcast;
+    //var emitter = fromServer ? websocket : socket.broadcast;
 
-    emitter.emit('message', message);
+    socket.broadcast.to(message.room).emit('message', message);
   });
 }
 var stdin = process.openStdin();
@@ -81,4 +79,32 @@ stdin.addListener('data', function(d) {
     createdAt: new Date(),
     user: { _id: 'robot' }
   }, null , true );
+});
+
+app.get('/rooms', function(req, res) {
+  db.collection('chatroom').find(function (err, chatrooms) {
+    res.send({chatrooms});  
+  })
+  
+});
+
+const schema = Joi.object().keys({
+  name: Joi.string().alphanum().min(3).max(30).required(),
+  color: Joi.string().alphanum().min(3).max(30),
+  avatarUrl: Joi.string().alphanum().min(10).max(300)
+});
+
+app.post('/rooms', function (req, res) {
+  console.log(req.body);
+  const result = Joi.validate(req.body, schema);
+  console.log(result);
+  if(result.error === null){
+    db.collection('chatroom').insert(req.body, (err, chatroom) => {
+      console.log(chatroom);
+      res.status(200).send({chatroom});
+    });
+  }else{
+    res.status(422).send({error: 'format invalid'});
+  }
+  
 });
