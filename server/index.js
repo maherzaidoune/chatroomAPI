@@ -28,8 +28,6 @@ websocket.on('connection', (socket) => {
 
 function onUserJoined(user, room, socket) {
   try {
-    console.log("user: ",user,"room", room," socket: ",socket)
-
   var user = db.collection('users').insert({user: user, room: room}, (err, user) => {
       socket.join(room);
   });
@@ -89,9 +87,9 @@ app.get('/rooms', function(req, res) {
 });
 
 const schema = Joi.object().keys({
-  name: Joi.string().alphanum().min(3).max(30).required(),
-  color: Joi.string().alphanum().min(3).max(30),
-  avatarUrl: Joi.string().alphanum().min(10).max(300)
+  name: Joi.string().min(3).max(30).required(),
+  color: Joi.string().min(3).max(30),
+  avatarUrl: Joi.string().min(10).max(300)
 });
 
 app.post('/rooms', function (req, res) {
