@@ -4,7 +4,7 @@ var socketio = require('socket.io');
 var mongojs = require('mongojs');
 const Joi = require('@hapi/joi');
 
-var db = mongojs('mongodb://test:test12@ds343895.mlab.com:43895/chatroom');
+// var db = mongojs('mongodb://test:test12@ds343895.mlab.com:43895/chatroom');
 var app = express();
 var server = http.Server(app);
 var websocket = socketio(server);
@@ -79,12 +79,9 @@ function _sendAndSaveMessage(message, socket, fromServer) {
 //   }, null , true );
 // });
 
-// app.get('/rooms', function(req, res) {
-//   db.collection('chatroom').find(function (err, chatrooms) {
-//     res.send({chatrooms});  
-//   })
-  
-// });
+app.get('/', function(req, res) {
+  res.status(201).send({msg: 'hello'});
+});
 
 // const schema = Joi.object().keys({
 //   name: Joi.string().min(3).max(30).required(),
